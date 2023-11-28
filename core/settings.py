@@ -36,6 +36,8 @@ DATABASES = {
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'drf_yasg',
     'common',
     'rest_framework',
     'vacancy',
@@ -143,7 +146,3 @@ REST_FRAMEWORK = {
     ),
 }
 
-try:
-    from .local_settings import *  # noqa
-except ImportError:
-    pass # noqa

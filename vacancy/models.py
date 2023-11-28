@@ -57,7 +57,7 @@ class Category(BaseModel):
    name = models.CharField(max_length=128)
    slug = models.CharField(max_length=256, blank=True, null=True)
    vacancy_count = models.IntegerField(default=0)
-   min_salary = models.IntegerField(default=9999999999)
+   min_salary = models.IntegerField(default=0)
    max_salary = models.IntegerField(default=0)
    parent = models.ForeignKey("self", null=True, blank=True, 
                related_name="child_category", on_delete=models.CASCADE)
@@ -68,8 +68,9 @@ class Category(BaseModel):
    def save(self, *args, **kwargs):
       if hasattr(self, "slug") and hasattr(self, "name"):
          if not self.slug:
-               self.slug = generate_unique_slug(self.__class__, self.name)
+            self.slug = generate_unique_slug(self.__class__, self.name)
       super().save(*args, **kwargs)
+
 
 class Vacancy(BaseModel):
    title = models.CharField(max_length=128)
@@ -94,7 +95,7 @@ class Vacancy(BaseModel):
    def save(self, created, *args, **kwargs):
       if hasattr(self, "slug") and hasattr(self, "title"):
          if not self.slug:
-               self.slug = generate_unique_slug(self.__class__, self.title)
+            self.slug = generate_unique_slug(self.__class__, self.title)
       company = self.company
       category = self.job
       parent = category.parent
@@ -108,9 +109,7 @@ class Vacancy(BaseModel):
       if self.min_salary<category.min_salary:
          category.min_salary = self.min_salary
       if self.max_salary>category.max_salary:
-         category.min_salary = self.min_salary
-      
-      
+         category.max_salary = self.max_salary
       
       if parent:
          if self.min_salary<parent.min_salary:
@@ -161,11 +160,11 @@ class Worker(BaseModel):
    def save(self, *args, **kwargs):
       if hasattr(self, "slug") and hasattr(self, self.user.full_name):
          if not self.slug:
-               self.slug = generate_unique_slug(self.__class__, self.user.full_name)
+            self.slug = generate_unique_slug(self.__class__, self.user.full_name)
 
       if hasattr(self, "slug") and hasattr(self, self.user.username):
          if not self.slug:
-               self.slug = generate_unique_slug(self.__class__, self.user.username)
+            self.slug = generate_unique_slug(self.__class__, self.user.username)
                
 
       super().save(*args, **kwargs)
@@ -194,6 +193,7 @@ class WorkerDesiredJob(BaseModel):
    employment_type = models.CharField(max_length=28, choices=WORK_STATUS)
    schedule = models.CharField(max_length=28, choices=WORK_SCHEDULE)
 
+
 class WorkerLanguages(BaseModel):
    LEVEL_CHOICES = (
       ("A1 (Beginner)", "A1 (Beginner)"),
@@ -208,6 +208,7 @@ class WorkerLanguages(BaseModel):
    language = models.CharField(max_length=56, choices=LANGUAGE_CHOICES)
    level = models.CharField(max_length=128, choices=LEVEL_CHOICES)
 
+
 class WorkerExperience(BaseModel):
    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="work_experience")
    position = models.CharField(max_length=128)
@@ -216,6 +217,7 @@ class WorkerExperience(BaseModel):
    start_date = models.DateField()
    end_date = models.DateField(null=True, blank=True)
    is_active = models.BooleanField(default=False) #hozirgacha shu kompaniyada ishlaydimi
+
 
 @receiver(post_save, sender=WorkerExperience)
 def my_handler(sender, created, instance, **kwargs):
@@ -232,6 +234,7 @@ def my_handler(sender, instance, **kwargs):
    else:
       worker.has_experience = False
    worker.save()
+
 
 class WorkerPortfoilo(BaseModel):
    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="portfoilo")
