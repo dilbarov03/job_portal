@@ -46,7 +46,7 @@ class RegionView(APIView):
       cat = []
       for category in categories:
          res = {
-            "name": category.parent.name
+            "name": category.parent.name if category.parent else category.name
          }
          if res not in cat:
             cat.append(res)
