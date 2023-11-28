@@ -92,7 +92,7 @@ class Vacancy(BaseModel):
    def short_description(self):
       return truncatechars(self.description, 35)
 
-   def save(self, created, *args, **kwargs):
+   def save(self, *args, **kwargs):
       if hasattr(self, "slug") and hasattr(self, "title"):
          if not self.slug:
             self.slug = generate_unique_slug(self.__class__, self.title)
@@ -102,8 +102,8 @@ class Vacancy(BaseModel):
       
       company.vacancy_count=Vacancy.objects.filter(company=company).count()
       company.save()
-      category.vacancy_count=Vacancy.objects.filter(category=category).count()
-      if parent and created:
+      category.vacancy_count=Vacancy.objects.filter(job=category).count()
+      if parent and self._state.adding:
          parent.vacancy_count+=1
       
       if self.min_salary<category.min_salary:

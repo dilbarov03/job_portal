@@ -33,7 +33,7 @@ class VacancyRegionSerializer(serializers.ModelSerializer):
    company = CompanyNameSerializer(read_only=True)
    class Meta:
       model = Vacancy
-      fields = ['title', 'company', 'min_salary', 'max_salary']
+      fields = ['id', 'title', 'slug', 'company', 'min_salary', 'max_salary']
 
 class RegionSerializer(serializers.ModelSerializer):
    class Meta:

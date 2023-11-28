@@ -80,7 +80,7 @@ class WorkerHomeView(APIView):
    permission_classes = [IsAuthenticated]
    def get(self, request, *args, **kwargs):
       worker = Worker.objects.filter(user=request.user).first()
-      recommended_jobs = Vacancy.objects.filter(reduce(operator.or_, (Q(title__contains=word) for word in worker.desired_job_title.split())))
+      recommended_jobs = Vacancy.objects.filter(reduce(operator.or_, (Q(title__contains=word.title) for word in worker.desired_job.all())))
       recJobs_serializer = VacancyRegionSerializer(recommended_jobs, many=True)
       savedJobs_Serializer = VacancyRegionSerializer(worker.saved_jobs, many=True)
       appliedJobs_Serializer = VacancyRegionSerializer(worker.applied_jobs, many=True)
@@ -180,7 +180,7 @@ class WorkerJobCRUDView(APIView):
 
    def get(self, request):
       worker_job = WorkerDesiredJob.objects.filter(worker=Worker.objects.get(user=self.request.user))
-      serializer = WorkerJobSerializer(worker_job)
+      serializer = WorkerJobSerializer(worker_job, many=True)
       return Response(serializer.data)
 
    def post(self, request, format=None):
