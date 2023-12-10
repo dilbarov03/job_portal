@@ -37,3 +37,29 @@ class User(AbstractUser):
         swappable = "AUTH_USER_MODEL"
         verbose_name = ("user")
         verbose_name_plural = ("users")
+
+
+class FAQ(models.Model):
+    question = models.CharField(max_length=256)
+    answer = models.TextField()
+
+    def __str__(self):
+        return f"{self.question}"
+
+    class Meta:
+        db_table = "faq"
+        verbose_name = ("faq")
+        verbose_name_plural = ("faqs")
+
+
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.user}"
+
+    class Meta:
+        db_table = "feedback"
+        verbose_name = ("feedback")
+        verbose_name_plural = ("feedbacks")

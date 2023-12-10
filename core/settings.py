@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-o24!%(%xbqi5%-$)8jv&i8@k39r3l&y&je-3!8_2+u-1f!yc)@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+
 
 DATABASES = {
     'default': {
@@ -55,11 +57,14 @@ INSTALLED_APPS = [
     
     'django_filters',
     'rest_framework_simplejwt',
+    "corsheaders",
+    
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -193,3 +198,15 @@ RESTORE_STATE_EXPIRE_SECONDS = 60 * 60 * 2  # all restore password period limit
 RESTORE_CODE_MAX_ATTEMPTS = 3  # allowed max number restore code
 
 SMS_CONFIRMATION_CODE_EXPIRE_SECONDS = 60 * 2  # sms code lifetime
+
+
+
+CORS_EXPOSE_HEADERS = ["*"]
+CORS_ALLOW_METHODS = ['*']
+CORS_ALLOW_HEADERS = ['*']
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+CSRF_COOKIE_SECURE = True
+# CSRF_TRUSTED_ORIGINS = ['https://47f2-195-158-20-242.ngrok-free.app']

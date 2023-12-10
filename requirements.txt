@@ -11,3 +11,4 @@ drf-yasg==1.21.7
 requests
 djangorestframework-simplejwt
 psycopg2
+django-cors-headers

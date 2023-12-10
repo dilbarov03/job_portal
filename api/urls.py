@@ -3,6 +3,8 @@ from .views import *
 
 urlpatterns = [
    #general 
+   path("feedback/", FeedbackCreateView.as_view()),
+   path("faq/", FAQListView.as_view()),
    path("general/", GeneralInfoView.as_view()),
    path("category/", CategoryView.as_view()),
    path("region/<str:region>/", RegionView.as_view()),

@@ -1,4 +1,4 @@
-from common.models import User
+from common.models import FAQ, Feedback, User
 from rest_framework import serializers
 from vacancy.models import ApplicationFeedback, Category, InterviewSchedule, Vacancy, Company, Worker, WorkerDesiredJob, WorkerExperience, WorkerLanguages, WorkerPortfoilo, JobApplication
 
@@ -185,3 +185,20 @@ class CompanyFeedbackCreateSerializer(serializers.ModelSerializer):
    class Meta:
       model = ApplicationFeedback
       fields = ("id", "worker", "text", "rating")
+
+
+class FAQSerializer(serializers.ModelSerializer):
+    """Serializer for creating user objects."""
+
+    class Meta:
+        model = FAQ
+        fields = ('id', 'question', 'answer')
+        
+        
+
+class FeedbackGeneralSerializer(serializers.ModelSerializer):
+    """Serializer for creating user objects."""
+
+    class Meta:
+        model = Feedback
+        fields = ('id', 'user', 'text')

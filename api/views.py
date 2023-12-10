@@ -6,6 +6,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from common.models import Feedback
 from vacancy.models import LANGUAGE_CHOICES, REGION_CHOICES, WORKER_STATUS, Category, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages, JobApplication, InterviewSchedule
 from django.db.models import Q
 from .serializers import *
@@ -435,3 +436,16 @@ class CompanyFeedbackCreateView(generics.CreateAPIView):
    def perform_create(self, serializer):
       company = Company.objects.filter(user=self.request.user).first()
       serializer.save(company=company, provider="company")
+
+
+class FAQListView(generics.ListAPIView):
+    """Handles creating and listing Users."""
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer
+
+
+class FeedbackCreateView(generics.CreateAPIView):
+    """Handles creating and listing Users."""
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackGeneralSerializer
+
