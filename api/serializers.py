@@ -1,6 +1,6 @@
 from common.models import User
 from rest_framework import serializers
-from vacancy.models import Category, Vacancy, Company, Worker, WorkerDesiredJob, WorkerExperience, WorkerLanguages, WorkerPortfoilo
+from vacancy.models import ApplicationFeedback, Category, InterviewSchedule, Vacancy, Company, Worker, WorkerDesiredJob, WorkerExperience, WorkerLanguages, WorkerPortfoilo, JobApplication
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class CompanyRegionSerializer(serializers.ModelSerializer):
 class CompanyNameSerializer(serializers.ModelSerializer):
    class Meta:
       model = Company
-      fields = ['title']
+      fields = ['title', 'id']
 
 class VacancyRegionSerializer(serializers.ModelSerializer):
    company = CompanyNameSerializer(read_only=True)
@@ -73,9 +73,18 @@ class WorkerPortfoiloSerializer(serializers.ModelSerializer):
       fields = "__all__"
 
 class VacancySerializer(serializers.ModelSerializer):
+   company = CompanyNameSerializer(read_only=True)
+   job = serializers.SerializerMethodField()
+   
    class Meta:
       model = Vacancy
       fields = "__all__"
+      
+   def get_job(self, value):
+      return {
+         "id": value.job.id,
+         "name": value.job.name
+      }
 
 class VacancyForCompanySerializer(serializers.ModelSerializer):
    class Meta:
@@ -107,3 +116,72 @@ class WorkerAllSerializer(serializers.ModelSerializer):
       "region", "resume", "status", "has_experience", "has_portfoilo", 
       "native_language", "languages", "desired_job", "work_experience", 
       "portfoilo"]
+      
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+   vacancy = VacancyRegionSerializer(read_only=True)
+   worker = serializers.SerializerMethodField()
+   
+   class Meta:
+      model = JobApplication
+      fields = ("id", "worker", "vacancy", "status")
+
+   def get_worker(self, value):
+      return {
+         "id": value.worker.id,
+         "full_name": value.worker.user.full_name
+      }
+      
+      
+class InterviewGetSerializer(serializers.ModelSerializer):
+   vacancy = VacancyRegionSerializer()
+   worker = serializers.SerializerMethodField()
+      
+   class Meta:
+      model = InterviewSchedule
+      fields = ("id", "worker", "vacancy", "date", "link")
+      
+   def get_worker(self, value):
+      return {
+         "id": value.worker.id,
+         "full_name": value.worker.user.full_name
+      }
+      
+         
+class InterviewScheduleSerializer(serializers.ModelSerializer):      
+   class Meta:
+      model = InterviewSchedule
+      fields = ("id", "worker", "vacancy", "date", "link")
+      
+
+class FeedbackSerializer(serializers.ModelSerializer):
+   company = serializers.SerializerMethodField()
+   worker = serializers.SerializerMethodField()
+   
+   class Meta:
+      model = ApplicationFeedback
+      fields = ("id", "company", "worker", "rating", "text")
+      
+   def get_company(self, value):
+      return {
+         "id": value.company.id,
+         "name": value.company.title
+      }
+      
+   def get_worker(self, value):
+      return {
+         "id": value.worker.id,
+         "full_name": value.worker.user.full_name
+      }
+
+
+class WorkerFeedbackCreateSerializer(serializers.ModelSerializer):
+   class Meta:
+      model = ApplicationFeedback
+      fields = ("id", "company", "text", "rating")
+
+
+class CompanyFeedbackCreateSerializer(serializers.ModelSerializer):
+   class Meta:
+      model = ApplicationFeedback
+      fields = ("id", "worker", "text", "rating")

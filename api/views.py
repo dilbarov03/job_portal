@@ -6,7 +6,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from vacancy.models import LANGUAGE_CHOICES, REGION_CHOICES, WORKER_STATUS, Category, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages
+from vacancy.models import LANGUAGE_CHOICES, REGION_CHOICES, WORKER_STATUS, Category, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages, JobApplication, InterviewSchedule
 from django.db.models import Q
 from .serializers import *
 from rest_framework import status
@@ -14,6 +14,9 @@ from django.http import Http404
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 
 class CategoryView(generics.ListAPIView):
    queryset = Category.objects.filter(parent=None).all()
@@ -124,23 +127,24 @@ class VacancyApplyView(APIView):
    permission_classes = [IsAuthenticated]
 
    def post(self, request, *args, **kwargs):
-      vacancy = Vacancy.objects.get(pk=self.kwargs.get("pk"))
+      vacancy = Vacancy.objects.filter(pk=self.kwargs.get("pk")).first()
       worker = Worker.objects.filter(user=request.user).first()
       if vacancy and worker:
-         if vacancy not in worker.applied_jobs.all():
-            worker.applied_jobs.add(vacancy)
-            worker.save()
-            appliedJobs_Serializer = VacancyRegionSerializer(worker.applied_jobs, many=True)
-            return Response({"status": "You applied successfully to this job", 
-            "Your applied vacancies": appliedJobs_Serializer.data})
-         return Response({"msg": "You have already applied to this job"})
+         if JobApplication.objects.filter(worker=worker, vacancy=vacancy).exists():
+            return Response({"msg": "You have already applied to this job"})
+         JobApplication.objects.create(worker=worker, vacancy=vacancy, status="pending")
+         return Response({"msg": "Successfully applied"})
+      return Response({"msg": "Vacancy not found"})
+
 
 class AppliedJobsView(APIView):
    permission_classes = [IsAuthenticated]
 
    def get(self, request):
       worker = Worker.objects.filter(user=request.user).first()
-      appliedJobs_Serializer = VacancyRegionSerializer(worker.applied_jobs, many=True)
+      applied_jobs = JobApplication.objects.filter(worker=worker).all()
+      
+      appliedJobs_Serializer = JobApplicationSerializer(applied_jobs, many=True)
       return Response(appliedJobs_Serializer.data)
 
 class UpdateResumeView(APIView):
@@ -266,14 +270,17 @@ class CompanyVacancyView(generics.ListCreateAPIView):
 
 class AppliedUsersView(generics.ListAPIView):
    permission_classes = [IsAuthenticated]
-   serializer_class = AppliedUserSerializer
+   serializer_class = JobApplicationSerializer
    
    def get_queryset(self):
       user = self.request.user
       company = Company.objects.get(user=user)
-      return Worker.objects.filter(applied_jobs__company=company).all() 
-
-
+      vacancy = Vacancy.objects.filter(pk=self.kwargs.get("pk")).first()
+      
+      job_applications = JobApplication.objects.filter(vacancy__company=company, vacancy=vacancy).all()
+      return job_applications
+      
+       
 class CompanyGetUpdateView(APIView):
    permission_classes = [IsAuthenticated]
    def get(self, request):
@@ -288,6 +295,30 @@ class CompanyGetUpdateView(APIView):
          serializer.save()
          return Response(serializer.data)
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class JobApplicationView(APIView):
+   permission_classes = [IsAuthenticated]
+   
+   state_param = openapi.Schema(
+      type=openapi.TYPE_OBJECT,
+      properties={
+         'status': openapi.Schema(type=openapi.TYPE_STRING, description='Status'),
+      }
+   )
+    
+   @swagger_auto_schema(request_body=state_param)
+   def post(self, request, *args, **kwargs):
+      job_application = JobApplication.objects.filter(id=self.kwargs.get("pk")).first()
+      company = Company.objects.filter(user=self.request.user).first()
+      if job_application.vacancy.company != company:
+         return Response({"msg": "This is not your vacancy"})
+      if job_application:
+         job_application.status = request.data.get("status")
+         job_application.save()
+         return Response({"msg": "Successfully updated"})
+      return Response({"msg": "Job application not found"})
+
 
 
 class WorkerFilter(filters.FilterSet):
@@ -335,3 +366,72 @@ class SearchWorkerView(generics.ListAPIView):
    serializer_class = WorkerAllSerializer
    filter_backends = [SearchFilter]
    search_fields = ['user__full_name', 'description', "desired_job__title"]
+   
+   
+class InterviewScheduleView(generics.CreateAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = InterviewScheduleSerializer
+   
+   def perform_create(self, serializer):
+      company = Company.objects.filter(user=self.request.user).first()
+      serializer.save(company=company)
+
+
+class InterviewScheduleUpdateView(generics.UpdateAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = InterviewScheduleSerializer
+   queryset = InterviewSchedule.objects.all()
+   
+            
+class CompanyInterviewListView(generics.ListAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = InterviewGetSerializer
+   
+   def get_queryset(self):
+      company = Company.objects.filter(user=self.request.user).first()
+      return InterviewSchedule.objects.filter(company=company).all()
+   
+   
+class WorkerInterviewListView(generics.ListAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = InterviewGetSerializer
+   
+   def get_queryset(self):
+      worker = Worker.objects.filter(user=self.request.user).first()
+      return InterviewSchedule.objects.filter(worker=worker).all()   
+
+
+class WorkerFeedbackList(generics.ListAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = FeedbackSerializer
+   
+   def get_queryset(self):
+      worker = Worker.objects.filter(user=self.request.user).first()
+      return ApplicationFeedback.objects.filter(worker=worker, provider="company").all()
+
+
+class WorkerFeedbackCreateView(generics.CreateAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = WorkerFeedbackCreateSerializer
+   
+   def perform_create(self, serializer):
+      worker = Worker.objects.filter(user=self.request.user).first()
+      serializer.save(worker=worker, provider="worker")
+
+
+class CompanyFeedbackList(generics.ListAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = FeedbackSerializer
+   
+   def get_queryset(self):
+      company = Company.objects.filter(user=self.request.user).first()
+      return ApplicationFeedback.objects.filter(company=company, provider="worker").all()
+
+
+class CompanyFeedbackCreateView(generics.CreateAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = CompanyFeedbackCreateSerializer
+   
+   def perform_create(self, serializer):
+      company = Company.objects.filter(user=self.request.user).first()
+      serializer.save(company=company, provider="company")

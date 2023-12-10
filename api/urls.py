@@ -25,12 +25,22 @@ urlpatterns = [
    path("worker/experience/<int:pk>", WorkerExperienceUpdateDeleteView.as_view()),
    path("worker/portfoilo", WorkerPortfoiloView.as_view()),
    path("worker/portfoilo/<int:pk>", WorkerPortfoiloUpdateDeleteView.as_view()),
+   path("worker/interviews", WorkerInterviewListView.as_view()),
+   path("worker/feedbacks", WorkerFeedbackList.as_view()),
+   path("worker/feedback/create", WorkerFeedbackCreateView.as_view()),
+
 
 
    #for company
    path("company/", CompanyListCreateView.as_view()),
    path("company/vacancy", CompanyVacancyView.as_view()),
-   path("company/applied_users/", AppliedUsersView.as_view()),
+   path("company/vacancy/<int:pk>/applied_users", AppliedUsersView.as_view()),
    path("company/update", CompanyGetUpdateView.as_view()),
+   path("company/job_application/<int:pk>", JobApplicationView.as_view()),
+   path("company/schedule_interview", InterviewScheduleView.as_view()),
+   path("company/interview/<int:pk>/update", InterviewScheduleUpdateView.as_view()),
+   path("company/interviews", CompanyInterviewListView.as_view()),
+   path("company/feedbacks", CompanyFeedbackList.as_view()),
+   path("company/feedback/create", CompanyFeedbackCreateView.as_view()),
    path("workers/all", WorkersFilterView.as_view()), #with filter
 ]

@@ -146,7 +146,6 @@ class Worker(BaseModel):
    resume = models.FileField(upload_to="files/", blank=True, null=True)
    status = models.CharField(max_length=128, choices=WORKER_STATUS)
    saved_jobs = models.ManyToManyField(Vacancy, blank=True)
-   applied_jobs = models.ManyToManyField(Vacancy, blank=True, related_name="applied_users")
    has_experience = models.BooleanField(default=False)
    has_portfoilo = models.BooleanField(default=False)
 
@@ -168,6 +167,21 @@ class Worker(BaseModel):
                
 
       super().save(*args, **kwargs)
+
+
+class JobApplication(BaseModel):
+   class ApllicationStatus(models.TextChoices):
+      PENDING = 'pending'
+      ACCEPTED = 'accepted'
+      REJECTED = 'rejected'
+   
+   worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="applied_jobs")
+   vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name="applied_workers")
+   status = models.CharField(max_length=128, choices=ApllicationStatus.choices, default=ApllicationStatus.PENDING)
+   
+   class Meta:
+      unique_together = ('worker', 'vacancy')
+
 
 class WorkerDesiredJob(BaseModel):
    WORK_STATUS = (
@@ -192,6 +206,17 @@ class WorkerDesiredJob(BaseModel):
    salary = models.IntegerField()
    employment_type = models.CharField(max_length=28, choices=WORK_STATUS)
    schedule = models.CharField(max_length=28, choices=WORK_SCHEDULE)
+
+
+class InterviewSchedule(BaseModel):
+   worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="interview_schedule")
+   company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="interview_schedule")
+   vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name="interview_schedule")
+   date = models.DateTimeField()
+   link = models.URLField()
+   
+   class Meta:
+      unique_together = ("worker", "vacancy")
 
 
 class WorkerLanguages(BaseModel):
@@ -256,3 +281,22 @@ def my_handler(sender, instance, **kwargs):
    else:
       worker.has_portfoilo = False
    worker.save()
+   
+   
+class ApplicationFeedback(BaseModel):
+   class FeedbackProvider(models.TextChoices):
+      WORKER = 'worker'
+      COMPANY = 'company'
+   
+   worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="feedback")
+   company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="feedback")
+   provider = models.CharField(max_length=128, choices=FeedbackProvider.choices)
+   text = models.TextField()
+   rating = models.IntegerField()
+   
+   class Meta:
+      unique_together = ("worker", "company", "provider")
+   
+
+
+   
