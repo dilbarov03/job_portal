@@ -56,9 +56,9 @@ class RegionView(APIView):
             cat.append(res)
 
       output = {
-         f"Компании в {region}": comp_serializer.data,
-         f"Вакансии дня в {region}": vac_serializer.data,
-         f"Работа по профессиям в {region}": cat
+         f"companies": comp_serializer.data,
+         f"vacancies": vac_serializer.data,
+         f"categories": cat
       }
 
       return Response(output)
@@ -87,12 +87,12 @@ class WorkerHomeView(APIView):
       recommended_jobs = Vacancy.objects.filter(reduce(operator.or_, (Q(title__contains=word.title) for word in worker.desired_job.all())))
       recJobs_serializer = VacancyRegionSerializer(recommended_jobs, many=True)
       savedJobs_Serializer = VacancyRegionSerializer(worker.saved_jobs, many=True)
+      
       appliedJobs_Serializer = VacancyRegionSerializer(worker.applied_jobs, many=True)
 
       result = {
-         "Избранные вакансии" : savedJobs_Serializer.data, 
-         "Отклики": appliedJobs_Serializer.data,
-         "Рекомендуем лично вам": recJobs_serializer.data
+         "saved_jobs" : savedJobs_Serializer.data, 
+         "recommended_jobs": recJobs_serializer.data
       }
 
       return Response(result)
