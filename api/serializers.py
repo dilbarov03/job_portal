@@ -201,4 +201,4 @@ class FeedbackGeneralSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feedback
-        fields = ('id', 'user', 'text')
+        fields = ('id', 'text')

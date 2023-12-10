@@ -10,7 +10,7 @@ class UserRegisterView(generics.CreateAPIView):
     """Handles creating and listing Users."""
     queryset = User.objects.all()
     serializer_class = RegisterUserSerializer
-    parser_classes = (MultiPartParser, FormParser)
+    # parser_classes = (MultiPartParser, FormParser)
 
     def create(self, request, *args, **kwargs):
         serializer = RegisterUserSerializer(data=request.data)

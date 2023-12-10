@@ -1,7 +1,5 @@
-from cgitb import lookup
 from functools import reduce
 import operator
-from random import choices
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -241,12 +239,14 @@ class WorkerExperienceUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class WorkerPortfoiloView(generics.ListCreateAPIView):
    permission_classes = [IsAuthenticated]
    serializer_class = WorkerPortfoiloSerializer
+   
    def get_queryset(self):
       return WorkerPortfoilo.objects.filter(worker=Worker.objects.filter(user=self.request.user).first()).all()
 
 class WorkerPortfoiloUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
    permission_classes = [IsAuthenticated]
    serializer_class = WorkerPortfoiloSerializer
+   
    def get_queryset(self):
       return WorkerPortfoilo.objects.filter(pk=self.kwargs.get("pk"), worker=Worker.objects.filter(user=self.request.user).first())  
 
@@ -448,4 +448,7 @@ class FeedbackCreateView(generics.CreateAPIView):
     """Handles creating and listing Users."""
     queryset = Feedback.objects.all()
     serializer_class = FeedbackGeneralSerializer
+    
+    def perform_create(self, serializer):
+      serializer.save(user=self.request.user)
 

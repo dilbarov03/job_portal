@@ -35,7 +35,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User(
             full_name=validated_data['full_name'],
-            email=validated_data['email']
+            email=validated_data['email'],
+            username=validated_data['email'],
         )
         user.set_password(validated_data['password'])
         user.save()    
@@ -66,7 +67,7 @@ class RecoverPasswordSerializer(serializers.Serializer):
 
 
                 user.set_password(password)
-                user.save()
+                user.save(commit=False)
                 confirm_signature.delete()
 
                 attrs['user'] = user

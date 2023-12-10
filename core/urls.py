@@ -18,6 +18,16 @@ from django.urls import include, path
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from drf_yasg.generators import OpenAPISchemaGenerator
+
+
+
+class BothHttpAndHttpsSchemaGenerator(OpenAPISchemaGenerator):
+    def get_schema(self, request=None, public=False):
+        schema = super().get_schema(request, public)
+        # schema.schemes = ["http", "https"]
+        schema.schemes = ["https", "http"]
+        return schema
 
 
 schema_view = get_schema_view(
@@ -31,6 +41,7 @@ schema_view = get_schema_view(
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
+   generator_class=BothHttpAndHttpsSchemaGenerator
 )
 
 urlpatterns = [
