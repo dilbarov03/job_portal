@@ -95,9 +95,14 @@ class WorkerHomeView(APIView):
 
       return Response(result)
 
-class WorkerGetCreateView(generics.ListCreateAPIView):
+class WorkerGetCreateView(generics.CreateAPIView):
    queryset = Worker.objects.all()
-   serializer_class = WorkerSerializer
+   serializer_class = WorkerCreateSerializer
+   permission_classes = (IsAuthenticated, )
+   
+   def perform_create(self, serializer):
+      return serializer.save(user=self.request.user)
+   
 
 class CharFilterInFilter(filters.BaseInFilter, filters.CharFilter):
     pass
@@ -257,9 +262,20 @@ TODO
    - /vacancy/<id>/applied_users - see who applied to your vacancy
 """
 
-class CompanyListCreateView(generics.ListCreateAPIView):
+class CompanyListCreateView(generics.ListAPIView):
    queryset = Company.objects.all()
    serializer_class = CompanySerializer
+
+
+class CompanyCreateView(generics.CreateAPIView):
+   queryset = Company.objects.all()
+   serializer_class = CompanyCreateSerializer
+   permission_classes = (IsAuthenticated, )
+   
+   def perform_create(self, serializer):
+      return serializer.save(user=self.request.user)
+   
+
 
 class CompanyVacancyView(generics.ListCreateAPIView):
    serializer_class = VacancySerializer

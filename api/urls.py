@@ -35,6 +35,7 @@ urlpatterns = [
 
    #for company
    path("company/", CompanyListCreateView.as_view()),
+   path("company/create", CompanyCreateView.as_view()),
    path("company/vacancy", CompanyVacancyView.as_view()),
    path("company/vacancy/<int:pk>/applied_users", AppliedUsersView.as_view()),
    path("company/update", CompanyGetUpdateView.as_view()),

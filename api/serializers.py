@@ -51,6 +51,15 @@ class WorkerSerializer(serializers.ModelSerializer):
    class Meta:
       model = Worker
       fields = "__all__"
+      
+
+class WorkerCreateSerializer(serializers.ModelSerializer):
+
+   class Meta:
+      model = Worker
+      fields = ("id", "description", "birthdate", "phone_number", "telegram", "region", "native_language", "resume",
+                "status")
+
 
 class WorkerJobSerializer(serializers.ModelSerializer):
    class Meta:
@@ -102,6 +111,13 @@ class CompanySerializer(serializers.ModelSerializer):
    class Meta:
       model = Company
       fields = "__all__"
+      
+      
+class CompanyCreateSerializer(serializers.ModelSerializer):
+   class Meta:
+      model = Company
+      fields = ("id", "title", "description", "location")
+      
 
 class WorkerAllSerializer(serializers.ModelSerializer):
    user = UserSerializer(read_only=True)
