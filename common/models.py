@@ -22,6 +22,9 @@ class User(AbstractUser):
     
     created_at = models.DateTimeField(("date created"), auto_now_add=True, null=True)
     updated_at = models.DateTimeField(("date updated"), auto_now=True)
+    
+    is_worker = models.BooleanField(default=False)
+    is_company = models.BooleanField(default=False)
 
     # SETTINGS
     USERNAME_FIELD = "email"

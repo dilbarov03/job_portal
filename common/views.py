@@ -1,9 +1,9 @@
 from rest_framework import generics, status
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from .models import User
-from .serializers import RecoverPasswordSerializer, RegisterUserSerializer
+from .serializers import RecoverPasswordSerializer, RegisterUserSerializer, UserProfileSerializer
 
 
 class UserRegisterView(generics.CreateAPIView):
@@ -30,3 +30,10 @@ class RecoverPasswordView(generics.CreateAPIView):
             success = True
             return Response({"success": success})
 
+
+class UserProfileView(generics.RetrieveAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = (IsAuthenticated,)
+    
+    def get_object(self):
+        return self.request.user

@@ -78,3 +78,10 @@ class RecoverPasswordSerializer(serializers.Serializer):
 
         else:
             raise serializers.ValidationError({'error': is_password_valid(password)[1]})    
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "full_name", "email", "is_worker", "is_company")

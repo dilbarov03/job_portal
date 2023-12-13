@@ -47,6 +47,10 @@ class Company(BaseModel):
          if not self.slug:
                self.slug = generate_unique_slug(self.__class__, self.title)
 
+      if self._state.adding:
+         self.user.is_company = True
+         self.user.save()
+
       super().save(*args, **kwargs)
 
    @property
@@ -164,6 +168,10 @@ class Worker(BaseModel):
       if hasattr(self, "slug") and hasattr(self, self.user.username):
          if not self.slug:
             self.slug = generate_unique_slug(self.__class__, self.user.username)
+            
+      if self._state.adding:
+         self.user.is_worker = True
+         self.user.save()
                
 
       super().save(*args, **kwargs)

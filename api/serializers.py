@@ -47,7 +47,7 @@ class WorkerResumeSerializer(serializers.ModelSerializer):
 
 class WorkerSerializer(serializers.ModelSerializer):
    saved_jobs = VacancyRegionSerializer(many=True)
-   applied_jobs = VacancyRegionSerializer(many=True)
+   # applied_jobs = VacancyRegionSerializer(many=True)
    class Meta:
       model = Worker
       fields = "__all__"
@@ -64,7 +64,12 @@ class WorkerCreateSerializer(serializers.ModelSerializer):
 class WorkerJobSerializer(serializers.ModelSerializer):
    class Meta:
       model = WorkerDesiredJob
-      fields = "__all__"
+      fields = ("id", "title", "category", "salary", "employment_type", "schedule")
+      
+   def create(self, validated_data):
+      worker = self.context['request'].user.worker
+      desired_job = WorkerDesiredJob.objects.create(worker=worker, **validated_data)
+      return desired_job
 
 class WorkerLanguageSerializer(serializers.ModelSerializer):
    class Meta:
