@@ -177,7 +177,7 @@ class GetUpdateProfileView(APIView):
 
    def put(self, request):
       worker = Worker.objects.filter(user=self.request.user).first()
-      serializer = WorkerSerializer(worker, data=request.data)
+      serializer = WorkerCreateSerializer(worker, data=request.data)
       if serializer.is_valid():
          serializer.save()
          return Response(serializer.data)
