@@ -229,12 +229,12 @@ class InterviewSchedule(BaseModel):
 
 class WorkerLanguages(BaseModel):
    LEVEL_CHOICES = (
-      ("A1 (Beginner)", "A1 (Beginner)"),
-      ("A2 (Elementary)", "A2 (Elementary)"),
-      ("B1 (Intermediate)", "B1 (Intermediate)"),
-      ("B2 (Upper-Intermediate)", "B2 (Upper-Intermediate)"),
-      ("C1 (Advanced)", "C1 (Advanced)"),
-      ("C2 (Proficiency)", "C2 (Proficiency)")
+      ("A1", "A1 (Beginner)"),
+      ("A2", "A2 (Elementary)"),
+      ("B1", "B1 (Intermediate)"),
+      ("B2", "B2 (Upper-Intermediate)"),
+      ("C1", "C1 (Advanced)"),
+      ("C2", "C2 (Proficiency)")
    )
    
    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="languages")
