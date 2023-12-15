@@ -296,6 +296,7 @@ class CompanyCreateView(generics.CreateAPIView):
 
 class CompanyVacancyView(generics.ListCreateAPIView):
    serializer_class = VacancySerializer
+   permission_classes = [IsAuthenticated]
 
    def get_queryset(self):
       user = self.request.user
@@ -490,3 +491,8 @@ class FeedbackCreateView(generics.CreateAPIView):
 class WorkerDetailView(generics.RetrieveAPIView):
    queryset = Worker.objects.all()
    serializer_class = WorkerDetailSerializer
+
+
+class CompanyDetailView(generics.RetrieveAPIView):
+   queryset = Company.objects.all()
+   serializer_class = CompanyDetailSerializer

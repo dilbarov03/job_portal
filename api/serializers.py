@@ -243,3 +243,11 @@ class WorkerDetailSerializer(serializers.ModelSerializer):
       fields = ('id', 'description', 'birthdate', 'phone_number', 'telegram', 'region', 
                'native_language', 'resume', 'status', 'has_experience', 'has_portfoilo',
                'user', 'portfoilo', 'work_experience', 'languages')
+
+
+class CompanyDetailSerializer(serializers.ModelSerializer):
+   company_vacancy = VacancySerializer(many=True)
+   
+   class Meta:
+      model = Company
+      fields = ("id", "title", "description", "location", "vacancy_count", "company_vacancy")
