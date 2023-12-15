@@ -232,11 +232,15 @@ class WorkerJobCRUDView(APIView):
 
 class WorkerLanguageView(generics.ListCreateAPIView):
    permission_classes = [IsAuthenticated]
-
    serializer_class = WorkerLanguageSerializer
 
    def get_queryset(self):
       return WorkerLanguages.objects.filter(worker=Worker.objects.filter(user=self.request.user).first()).all()   
+
+   def perform_create(self, serializer):
+      worker = Worker.objects.filter(user=self.request.user).first()
+      serializer.save(worker=worker)
+   
 
 class WorkerLanguageUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
    permission_classes = [IsAuthenticated]
@@ -248,14 +252,22 @@ class WorkerLanguageUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class WorkerExperienceView(generics.ListCreateAPIView):
    permission_classes = [IsAuthenticated]
    serializer_class = WorkerExperienceSerializer
+   
    def get_queryset(self):
       return WorkerExperience.objects.filter(worker=Worker.objects.filter(user=self.request.user).first()).all()
+
+   def perform_create(self, serializer):
+      worker = Worker.objects.filter(user=self.request.user).first()
+      serializer.save(worker=worker)
+
 
 class WorkerExperienceUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
    permission_classes = [IsAuthenticated]
    serializer_class = WorkerExperienceSerializer
+   
    def get_queryset(self):
       return WorkerExperience.objects.filter(pk=self.kwargs.get("pk"), worker=Worker.objects.filter(user=self.request.user).first())  
+
 
 class WorkerPortfoiloView(generics.ListCreateAPIView):
    permission_classes = [IsAuthenticated]
@@ -264,6 +276,11 @@ class WorkerPortfoiloView(generics.ListCreateAPIView):
    
    def get_queryset(self):
       return WorkerPortfoilo.objects.filter(worker=Worker.objects.filter(user=self.request.user).first()).all()
+
+   def perform_create(self, serializer):
+      worker = Worker.objects.filter(user=self.request.user).first()
+      serializer.save(worker=worker)
+
 
 class WorkerPortfoiloUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
    permission_classes = [IsAuthenticated]
