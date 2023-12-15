@@ -47,6 +47,7 @@ class WorkerResumeSerializer(serializers.ModelSerializer):
 
 class WorkerSerializer(serializers.ModelSerializer):
    saved_jobs = VacancyRegionSerializer(many=True)
+   user = UserSerializer(read_only=True)
    # applied_jobs = VacancyRegionSerializer(many=True)
    class Meta:
       model = Worker
@@ -74,12 +75,13 @@ class WorkerJobSerializer(serializers.ModelSerializer):
 class WorkerLanguageSerializer(serializers.ModelSerializer):
    class Meta:
       model = WorkerLanguages
-      fields = "__all__"
+      fields = ("id", "language", "level")
 
 class WorkerExperienceSerializer(serializers.ModelSerializer):
    class Meta:
       model = WorkerExperience
-      fields = "__all__"
+      fields = ("id", "position", "organization", "organization_category", "start_date",
+                "end_date", "is_active")
 
 class WorkerPortfoiloSerializer(serializers.ModelSerializer):
    class Meta:
@@ -228,3 +230,16 @@ class FeedbackGeneralSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ('id', 'text')
+        
+
+class WorkerDetailSerializer(serializers.ModelSerializer):
+   user = UserSerializer(read_only=True)
+   portfoilo = WorkerPortfoiloSerializer(many=True)
+   languages = WorkerLanguageSerializer(many=True)
+   work_experience = WorkerExperienceSerializer(many=True)
+
+   class Meta:
+      model = Worker
+      fields = ('id', 'description', 'birthdate', 'phone_number', 'telegram', 'region', 
+               'native_language', 'resume', 'status', 'has_experience', 'has_portfoilo',
+               'user', 'portfoilo', 'work_experience', 'languages')

@@ -18,6 +18,7 @@ urlpatterns = [
    path("vacancy/all", VacancyFilterView.as_view()), #with filter
    path("vacancy/<int:pk>/apply", VacancyApplyView.as_view()),
    path("vacancy/<int:pk>/save", VacancySaveView.as_view()),
+   path("worker/<int:pk>/detail", WorkerDetailView.as_view()),
    path("worker/applied_jobs", AppliedJobsView.as_view()),
    path("worker/resume", UpdateResumeView.as_view()),
    path("worker/profile", GetUpdateProfileView.as_view()),
