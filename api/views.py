@@ -299,6 +299,14 @@ TODO
 class CompanyListCreateView(generics.ListAPIView):
    queryset = Company.objects.all()
    serializer_class = CompanySerializer
+   
+
+class CompanyProfileView(generics.RetrieveAPIView):
+   queryset = Company.objects.all()
+   serializer_class = CompanySerializer
+   
+   def get_object(self):
+      return Company.objects.filter(user=self.request.user).first()
 
 
 class CompanyCreateView(generics.CreateAPIView):
@@ -312,13 +320,37 @@ class CompanyCreateView(generics.CreateAPIView):
 
 
 class CompanyVacancyView(generics.ListCreateAPIView):
-   serializer_class = VacancySerializer
    permission_classes = [IsAuthenticated]
 
    def get_queryset(self):
       user = self.request.user
       company = Company.objects.filter(user=user).first()
       return Vacancy.objects.filter(company=company).all()
+   
+   def get_serializer_class(self):
+      if self.request.method == "GET":
+         return VacancySerializer
+      return VacancyCreateSerializer
+   
+   def perform_create(self, serializer):
+      user = self.request.user
+      company = Company.objects.filter(user=user).first()
+      serializer.save(company=company)
+      company.vacancy_count += 1
+      company.save()
+
+
+class CompanyVacancyUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+   permission_classes = [IsAuthenticated]
+   serializer_class = VacancyCreateSerializer
+   queryset = Vacancy.objects.all()
+      
+   def perform_destroy(self, instance):
+      company = Company.objects.filter(user=self.request.user).first()
+      company.vacancy_count -= 1
+      company.save()
+      instance.delete()
+
 
 class AppliedUsersView(generics.ListAPIView):
    permission_classes = [IsAuthenticated]
@@ -333,21 +365,12 @@ class AppliedUsersView(generics.ListAPIView):
       return job_applications
       
        
-class CompanyGetUpdateView(APIView):
+class CompanyGetUpdateView(generics.UpdateAPIView):
    permission_classes = [IsAuthenticated]
-   def get(self, request):
-      company = Company.objects.filter(user=self.request.user).first()
-      serializer = CompanySerializer(company)
-      return Response(serializer.data)
-
-   def put(self, request):
-      company = Company.objects.filter(user=self.request.user).first()
-      serializer = CompanySerializer(company, data=request.data)
-      if serializer.is_valid():
-         serializer.save()
-         return Response(serializer.data)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+   serializer_class = CompanyCreateSerializer
+   
+   def get_object(self):
+      return Company.objects.filter(user=self.request.user).first()
 
 class JobApplicationView(APIView):
    permission_classes = [IsAuthenticated]

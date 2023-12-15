@@ -99,14 +99,23 @@ class VacancySerializer(serializers.ModelSerializer):
    
    class Meta:
       model = Vacancy
-      fields = "__all__"
+      fields = ("id", "title", "description", "company", "job", "min_salary", "max_salary", 
+                "region", "is_active", "is_remote")
       
    def get_job(self, value):
       return {
          "id": value.job.id,
          "name": value.job.name
       }
-
+   
+class VacancyCreateSerializer(serializers.ModelSerializer):
+   
+   class Meta:
+      model = Vacancy
+      fields = ("id", "title", "description", "job", "min_salary", "max_salary", 
+                "region", "is_active", "is_remote")
+      
+      
 class VacancyForCompanySerializer(serializers.ModelSerializer):
    class Meta:
       model = Vacancy
