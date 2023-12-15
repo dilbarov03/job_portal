@@ -139,6 +139,21 @@ class VacancyApplyView(APIView):
          JobApplication.objects.create(worker=worker, vacancy=vacancy, status="pending")
          return Response({"msg": "Successfully applied"})
       return Response({"msg": "Vacancy not found"})
+   
+
+class VacancySaveView(APIView):
+   permission_classes = [IsAuthenticated]
+
+   def post(self, request, *args, **kwargs):
+      vacancy = Vacancy.objects.filter(pk=self.kwargs.get("pk")).first()
+      worker = Worker.objects.filter(user=request.user).first()
+      if vacancy and worker:
+         if worker.saved_jobs.filter(pk=vacancy.pk).exists():
+            worker.saved_jobs.remove(vacancy)
+            return Response({"msg": "Successfully removed"})
+         worker.saved_jobs.add(vacancy)
+         return Response({"msg": "Successfully saved"})
+      return Response({"msg": "Vacancy not found"})
 
 
 class AppliedJobsView(APIView):
