@@ -4,6 +4,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from common.models import Feedback
 from vacancy.models import LANGUAGE_CHOICES, REGION_CHOICES, WORKER_STATUS, Category, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages, JobApplication, InterviewSchedule
 from django.db.models import Q
@@ -259,6 +260,7 @@ class WorkerExperienceUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class WorkerPortfoiloView(generics.ListCreateAPIView):
    permission_classes = [IsAuthenticated]
    serializer_class = WorkerPortfoiloSerializer
+   parser_classes = [MultiPartParser, FormParser]
    
    def get_queryset(self):
       return WorkerPortfoilo.objects.filter(worker=Worker.objects.filter(user=self.request.user).first()).all()
