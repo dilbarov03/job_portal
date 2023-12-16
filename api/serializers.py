@@ -1,6 +1,6 @@
 from common.models import FAQ, Feedback, User
 from rest_framework import serializers
-from vacancy.models import ApplicationFeedback, Category, InterviewSchedule, Vacancy, Company, Worker, WorkerDesiredJob, WorkerExperience, WorkerLanguages, WorkerPortfoilo, JobApplication
+from vacancy.models import ApplicationFeedback, Category, InterviewSchedule, Notification, Vacancy, Company, Worker, WorkerDesiredJob, WorkerExperience, WorkerLanguages, WorkerPortfoilo, JobApplication
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -256,3 +256,10 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
    class Meta:
       model = Company
       fields = ("id", "title", "description", "location", "vacancy_count", "company_vacancy")
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+   
+   class Meta:
+      model = Notification 
+      fields = ("id", "text", "created_at")

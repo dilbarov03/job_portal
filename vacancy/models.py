@@ -306,5 +306,8 @@ class ApplicationFeedback(BaseModel):
       unique_together = ("worker", "company", "provider")
    
 
-
+class Notification(BaseModel):
+   worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="notifications")
+   text = models.TextField()
+   
    

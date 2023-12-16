@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from common.models import Feedback
-from vacancy.models import LANGUAGE_CHOICES, REGION_CHOICES, WORKER_STATUS, Category, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages, JobApplication, InterviewSchedule
+from vacancy.models import LANGUAGE_CHOICES, REGION_CHOICES, WORKER_STATUS, Category, Notification, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages, JobApplication, InterviewSchedule
 from django.db.models import Q
 from .serializers import *
 from rest_framework import status
@@ -393,8 +393,14 @@ class JobApplicationView(APIView):
       if job_application.vacancy.company != company:
          return Response({"msg": "This is not your vacancy"})
       if job_application:
-         job_application.status = request.data.get("status")
+         status = request.data.get("status")
+         job_application.status = status
          job_application.save()
+         
+         notification_text = f"Your application to the vacancy: '{job_application.vacancy.title}' was {status}"
+         
+         Notification.objects.create(worker=job_application.worker, text=notification_text)
+         
          return Response({"msg": "Successfully updated"})
       return Response({"msg": "Job application not found"})
 
@@ -540,3 +546,13 @@ class WorkerDetailView(generics.RetrieveAPIView):
 class CompanyDetailView(generics.RetrieveAPIView):
    queryset = Company.objects.all()
    serializer_class = CompanyDetailSerializer
+
+
+class NotificationsView(generics.ListAPIView):
+   serializer_class = NotificationSerializer
+   permission_classes = (IsAuthenticated, )
+
+
+   def get_queryset(self):
+      worker = Worker.objects.filter(user=self.request.user).first()
+      return Notification.objects.filter(worker=worker).order_by("-created_at")

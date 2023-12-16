@@ -32,6 +32,7 @@ urlpatterns = [
    path("worker/interviews", WorkerInterviewListView.as_view()),
    path("worker/feedbacks", WorkerFeedbackList.as_view()),
    path("worker/feedback/create", WorkerFeedbackCreateView.as_view()),
+   path("worker/notifications/", NotificationsView.as_view()),
 
 
 
