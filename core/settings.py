@@ -209,3 +209,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_COOKIE_SECURE = True
 # CSRF_TRUSTED_ORIGINS = ['https://47f2-195-158-20-242.ngrok-free.app']
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.com'
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "mmymai1@yandex.com"
+EMAIL_HOST_PASSWORD = "hdmhujuwlernhenn"

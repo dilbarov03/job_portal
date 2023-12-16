@@ -88,10 +88,6 @@ class WorkerPortfoiloSerializer(serializers.ModelSerializer):
       model = WorkerPortfoilo
       fields = ("id", "description", "image")
       
-   def create(self, validated_data):
-      worker = self.context['request'].user.worker
-      portfoilo = WorkerPortfoilo.objects.create(worker=worker, **validated_data)
-      return portfoilo
 
 class VacancySerializer(serializers.ModelSerializer):
    company = CompanyNameSerializer(read_only=True)

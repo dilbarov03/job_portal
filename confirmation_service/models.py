@@ -73,7 +73,7 @@ class EmailConfirmation(BaseConfirmation):
     email = models.EmailField(max_length=1024)
 
     def send_code(self, message_body: str = None) -> bool:
-        message_body = str(message_body or "Код подтверждения: %(code)s \nНикому не давайте код!")
+        message_body = str(message_body or "Confirmation code: %(code)s")
         self.code = self.get_random_code()
         self.code_expired_at = timezone.now() + timedelta(seconds=settings.SMS_CONFIRMATION_CODE_EXPIRE_SECONDS)
         message = message_body % {'code': self.code}

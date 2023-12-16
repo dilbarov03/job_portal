@@ -202,21 +202,24 @@ class GetUpdateProfileView(APIView):
 class WorkerJobCRUDView(APIView):
    permission_classes = [IsAuthenticated]
 
+
    def get(self, request):
       worker_job = WorkerDesiredJob.objects.filter(worker=Worker.objects.filter(user=self.request.user).first())
       serializer = WorkerJobSerializer(worker_job, many=True)
       return Response(serializer.data)
 
+   @swagger_auto_schema(request_body=WorkerJobSerializer)
    def post(self, request, format=None):
-      serializer = WorkerJobSerializer(data=request.data)
-      if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+      serializer = WorkerJobSerializer(data=request.data, context={'request': request})
+      if serializer.is_valid(raise_exception=True):
+         serializer.save()
+         return Response(serializer.data, status=status.HTTP_201_CREATED)
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+   @swagger_auto_schema(request_body=WorkerJobSerializer)
    def put(self, request):
       worker_job = WorkerDesiredJob.objects.filter(worker=Worker.objects.filter(user=self.request.user).first())
-      serializer = WorkerJobSerializer(worker_job, data=request.data)
+      serializer = WorkerJobSerializer(worker_job, data=request.data, context={'request': request})
       if serializer.is_valid():
          serializer.save()
          return Response(serializer.data)
@@ -229,6 +232,7 @@ class WorkerJobCRUDView(APIView):
       else:
          raise Http404
       return Response({"msg": "Successfully deleted"})
+
 
 class WorkerLanguageView(generics.ListCreateAPIView):
    permission_classes = [IsAuthenticated]
