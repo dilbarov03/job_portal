@@ -212,12 +212,30 @@ class WorkerFeedbackCreateSerializer(serializers.ModelSerializer):
    class Meta:
       model = ApplicationFeedback
       fields = ("id", "company", "text", "rating")
+      
+   def validate(self, data):
+      if data["rating"] > 10 or data["rating"] < 1:
+         raise serializers.ValidationError("Rating must be between 1 and 10")
+      company = data["company"]
+      worker = self.context["request"].user.worker
+      if ApplicationFeedback.objects.filter(company=company, worker=worker, provider="worker").exists():
+         raise serializers.ValidationError("You already have feedback for this company")
+      return data
 
 
 class CompanyFeedbackCreateSerializer(serializers.ModelSerializer):
    class Meta:
       model = ApplicationFeedback
       fields = ("id", "worker", "text", "rating")
+      
+   def validate(self, data):
+      if data["rating"] > 10 or data["rating"] < 1:
+         raise serializers.ValidationError("Rating must be between 1 and 10")
+      worker = data["worker"]
+      company = self.context["request"].user.company
+      if ApplicationFeedback.objects.filter(company=company, worker=worker, provider="company").exists():
+         raise serializers.ValidationError("You already have feedback for this worker")
+      return data
 
 
 class FAQSerializer(serializers.ModelSerializer):
