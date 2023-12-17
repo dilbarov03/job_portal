@@ -20,6 +20,7 @@ urlpatterns = [
    path("vacancy/<int:pk>/save", VacancySaveView.as_view()),
    path("worker/<int:pk>/detail", WorkerDetailView.as_view()),
    path("worker/applied_jobs", AppliedJobsView.as_view()),
+   path("worker/applied_job/<int:pk>/cancel", AppliedJobCancelView.as_view()),
    path("worker/resume", UpdateResumeView.as_view()),
    path("worker/profile", GetUpdateProfileView.as_view()),
    path("worker/desired_job", WorkerJobCRUDView.as_view()),

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages, WorkerExperience, WorkerPortfoilo
+from .models import Category, JobApplication, Vacancy, Company, Worker, WorkerDesiredJob, WorkerLanguages, WorkerExperience, WorkerPortfoilo
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
@@ -37,3 +37,8 @@ class WorkerAdmin(admin.ModelAdmin):
 @admin.register(WorkerDesiredJob)
 class WorkerDJAdmin(admin.ModelAdmin):
    list_display = ["worker"]   
+   
+
+@admin.register(JobApplication)
+class JobApplicationAdmin(admin.ModelAdmin):
+   list_display = ["worker", "vacancy", "status"]

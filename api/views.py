@@ -167,6 +167,26 @@ class AppliedJobsView(APIView):
       appliedJobs_Serializer = JobApplicationSerializer(applied_jobs, many=True)
       return Response(appliedJobs_Serializer.data)
 
+
+class AppliedJobCancelView(APIView):
+   permission_classes = [IsAuthenticated]
+   
+   def delete(self, request, *args, **kwargs):
+      job_application = JobApplication.objects.filter(id=self.kwargs.get("pk")).first()
+      worker = Worker.objects.filter(user=request.user).first()
+      if job_application and worker:
+         if job_application.worker != worker:
+            return Response({"msg": "This is not your application"})
+         if job_application.status == "accepted":
+            return Response({"msg": "You can't cancel accepted application"})
+         if job_application.status == "rejected":
+            return Response({"msg": "You can't cancel rejected application"})
+         
+         job_application.delete()
+         return Response({"msg": "Successfully deleted"})
+      return Response({"msg": "Job application not found"})
+      
+
 class UpdateResumeView(APIView):
    permission_classes = [IsAuthenticated]
 
