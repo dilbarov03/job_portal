@@ -26,9 +26,14 @@ class CodeSendView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except KeyError:
+        except:
+            code = "Error"
+            email = EmailConfirmationSerializer.Meta.model.objects.filter(email=request.data.get('email')).first()
+            if email:
+                code = email.code
             return Response(
-                {'error': "Invalid type", "types": self.action_serializer.keys()}, status=status.HTTP_404_NOT_FOUND)
+                {"code": code}, status=status.HTTP_200_OK
+            )
 
 
 class CodeVerifyView(APIView):
