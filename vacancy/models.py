@@ -132,7 +132,7 @@ class Vacancy(BaseModel):
 def my_handler(sender, instance, **kwargs):
    company = instance.company
    company.vacancy_count=Vacancy.objects.filter(company=company).count()
-   parent = company.parent
+   parent = instance.job.parent
    if parent:
       parent.vacancy_count-=1
       parent.save()
